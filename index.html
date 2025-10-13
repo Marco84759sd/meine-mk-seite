@@ -430,8 +430,8 @@
             <h2>Member-Login</h2>
             <p>Zugriff auf Unterlagen, Backtests, Excel-Vorlagen und Kursmaterialien.</p>
             <form>
-                <input type="email" placeholder="E-Mail">
-                <input type="password" placeholder="Passwort">
+                <input type="email" name="email" placeholder="E-Mail">
+                <input type="password" name="password" placeholder="Passwort">
                 <button type="submit" class="btn">Einloggen</button>
             </form>
             <div class="member-features">
@@ -465,16 +465,16 @@
             </div>
             
             <form>
-                <input type="text" placeholder="Name">
-                <input type="email" placeholder="E-Mail">
-                <input type="tel" placeholder="Telefon">
-                <select>
+                <input type="text" name="name" placeholder="Name">
+                <input type="email" name="email" placeholder="E-Mail">
+                <input type="tel" name="telefon" placeholder="Telefon">
+                <select name="kontaktart">
                     <option value="">Bevorzugte Kontaktart</option>
                     <option value="zoom">Zoom-Call</option>
                     <option value="vorort">Persönlich in Gossau SG</option>
                     <option value="telefon">Telefonat</option>
                 </select>
-                <textarea placeholder="Ihre Nachricht oder gewünschter Termin" rows="5"></textarea>
+                <textarea name="nachricht" placeholder="Ihre Nachricht oder gewünschter Termin" rows="5"></textarea>
                 <button type="submit" class="btn">Kostenloses Gespräch anfragen</button>
             </form>
         </div>
