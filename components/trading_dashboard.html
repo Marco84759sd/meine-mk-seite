@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saisonalitäten Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .filter-section select {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: white;
+            color: #333;
+            cursor: pointer;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-card {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .stat-value.positive {
+            color: #28a745;
+        }
+        .stat-value.negative {
+            color: #dc3545;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .stat-sublabel {
+            color: #999;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .chart-container {
+            margin: 30px 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            position: relative;
+        }
+        #equityChart, #monthlyChart {
+            width: 100%;
+            height: 400px;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+            white-space: nowrap;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50 !important;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e8f5e8 !important;
+        }
+        .right-align {
+            text-align: right;
+        }
+        
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 15px;
+            }
+            .stat-value {
+                font-size: 24px;
+            }
+            .stat-label {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Saisonalitäten Dashboard</h1>
+        
+        <div class="filter-section">
+            <select id="yearFilter">
+                <option value="alle">Alle Jahre</option>
+                <option value="2010">2010</option>
+            </select>
+        </div>
+        
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-value">100</div>
+                <div class="stat-label">Gesamte Trades</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value positive">+27.2%</div>
+                <div class="stat-label">Performance</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value positive">13604</div>
+                <div class="stat-label">Gesamtgewinn</div>
+                <div class="stat-sublabel">CHF</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">60.0%</div>
+                <div class="stat-label">Gewinnrate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">50,000</div>
+                <div class="stat-label">Kontogröße</div>
+                <div class="stat-sublabel">CHF</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="equityChart"></canvas>
+            <div class="tooltip" id="tooltip"></div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+        
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Strategie</th>
+                    <th>Einstieg Datum</th>
+                    <th>Exit Datum</th>
+                    <th class="right-align">Gewinn</th>
+                    <th class="right-align">Equity</th>
+                    <th>Jahr</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Hartkodierte Trading-Daten
+        const allData = [
+            {"Strategie": "Intuit", "Einstieg Datum": "02.01.2010", "Exit Datum": "11.01.2010", "Gewinn": 918, "Equity": 918, "Jahr": 2010},
+            {"Strategie": "Salesforce.com, Inc", "Einstieg Datum": "02.01.2010", "Exit Datum": "11.01.2010", "Gewinn": 1349, "Equity": 2267, "Jahr": 2010},
+            {"Strategie": "Unilever", "Einstieg Datum": "02.01.2010", "Exit Datum": "21.01.2010", "Gewinn": -745, "Equity": 1522, "Jahr": 2010},
+            {"Strategie": "Boston Beer", "Einstieg Datum": "02.01.2010", "Exit Datum": "01.02.2010", "Gewinn": 707, "Equity": 2229, "Jahr": 2010},
+            {"Strategie": "LANXESS", "Einstieg Datum": "29.01.2010", "Exit Datum": "11.02.2010", "Gewinn": -110, "Equity": 2119, "Jahr": 2010},
+            {"Strategie": "Netflix", "Einstieg Datum": "29.01.2010", "Exit Datum": "13.02.2010", "Gewinn": 4, "Equity": 2123, "Jahr": 2010},
+            {"Strategie": "McDonalds", "Einstieg Datum": "03.01.2010", "Exit Datum": "15.02.2010", "Gewinn": 1127, "Equity": 3250, "Jahr": 2010},
+            {"Strategie": "Broadridge", "Einstieg Datum": "23.01.2010", "Exit Datum": "15.02.2010", "Gewinn": -49, "Equity": 3201, "Jahr": 2010},
+            {"Strategie": "Costco Wholesale Corporation", "Einstieg Datum": "21.01.2010", "Exit Datum": "16.02.2010", "Gewinn": -67, "Equity": 3134, "Jahr": 2010},
+            {"Strategie": "HSBC Holdings", "Einstieg Datum": "30.01.2010", "Exit Datum": "16.02.2010", "Gewinn": 43, "Equity": 3177, "Jahr": 2010},
+            {"Strategie": "Aon plc AON", "Einstieg Datum": "13.01.2010", "Exit Datum": "17.02.2010", "Gewinn": -366, "Equity": 2811, "Jahr": 2010},
+            {"Strategie": "Cancom", "Einstieg Datum": "25.01.2010", "Exit Datum": "17.02.2010", "Gewinn": 189, "Equity": 3000, "Jahr": 2010},
+            {"Strategie": "Billiton", "Einstieg Datum": "25.01.2010", "Exit Datum": "17.02.2010", "Gewinn": 148, "Equity": 3148, "Jahr": 2010},
+            {"Strategie": "Walmart Inc", "Einstieg Datum": "02.02.2010", "Exit Datum": "18.02.2010", "Gewinn": 688, "Equity": 3836, "Jahr": 2010},
+            {"Strategie": "Givaudan", "Einstieg Datum": "17.01.2010", "Exit Datum": "18.02.2010", "Gewinn": 1685, "Equity": 5521, "Jahr": 2010},
+            {"Strategie": "ResMed Inc", "Einstieg Datum": "30.01.2010", "Exit Datum": "18.02.2010", "Gewinn": -113, "Equity": 5408, "Jahr": 2010},
+            {"Strategie": "Boeing", "Einstieg Datum": "22.01.2010", "Exit Datum": "20.02.2010", "Gewinn": 98, "Equity": 5506, "Jahr": 2010},
+            {"Strategie": "Fortinet", "Einstieg Datum": "31.01.2010", "Exit Datum": "22.02.2010", "Gewinn": 323, "Equity": 5829, "Jahr": 2010},
+            {"Strategie": "Thermo Fisher", "Einstieg Datum": "12.02.2010", "Exit Datum": "25.02.2010", "Gewinn": -34, "Equity": 5795, "Jahr": 2010},
+            {"Strategie": "Caterpillar", "Einstieg Datum": "29.01.2010", "Exit Datum": "02.03.2010", "Gewinn": -70, "Equity": 5725, "Jahr": 2010},
+            {"Strategie": "Chipotle Mexican Grill Inc", "Einstieg Datum": "01.02.2010", "Exit Datum": "04.03.2010", "Gewinn": 253, "Equity": 5978, "Jahr": 2010},
+            {"Strategie": "YUM! Brands", "Einstieg Datum": "18.02.2010", "Exit Datum": "12.03.2010", "Gewinn": 46, "Equity": 6024, "Jahr": 2010},
+            {"Strategie": "Consolidated Edison", "Einstieg Datum": "17.02.2010", "Exit Datum": "15.03.2010", "Gewinn": -284, "Equity": 5740, "Jahr": 2010},
+            {"Strategie": "Extra Space Storage", "Einstieg Datum": "16.03.2010", "Exit Datum": "05.04.2010", "Gewinn": 157, "Equity": 5897, "Jahr": 2010},
+            {"Strategie": "Royal Caribbean Cruises", "Einstieg Datum": "01.03.2010", "Exit Datum": "06.04.2010", "Gewinn": 66, "Equity": 5963, "Jahr": 2010},
+            {"Strategie": "Prologis", "Einstieg Datum": "28.02.2010", "Exit Datum": "08.04.2010", "Gewinn": 1012, "Equity": 6975, "Jahr": 2010},
+            {"Strategie": "Air Products and Chemicals", "Einstieg Datum": "14.03.2010", "Exit Datum": "09.04.2010", "Gewinn": 480, "Equity": 7455, "Jahr": 2010},
+            {"Strategie": "Apple", "Einstieg Datum": "23.03.2010", "Exit Datum": "11.04.2010", "Gewinn": -59, "Equity": 7396, "Jahr": 2010},
+            {"Strategie": "Loreal", "Einstieg Datum": "13.03.2010", "Exit Datum": "14.04.2010", "Gewinn": 182, "Equity": 7578, "Jahr": 2010},
+            {"Strategie": "Equinix", "Einstieg Datum": "14.03.2010", "Exit Datum": "21.04.2010", "Gewinn": -89, "Equity": 7489, "Jahr": 2010},
+            {"Strategie": "Carnival Corporation", "Einstieg Datum": "24.03.2010", "Exit Datum": "22.04.2010", "Gewinn": 418, "Equity": 7907, "Jahr": 2010},
+            {"Strategie": "Platin", "Einstieg Datum": "14.03.2010", "Exit Datum": "23.04.2010", "Gewinn": 400, "Equity": 8307, "Jahr": 2010},
+            {"Strategie": "Beiersdorf Aktiengesellschaft", "Einstieg Datum": "08.03.2010", "Exit Datum": "24.04.2010", "Gewinn": 67, "Equity": 8374, "Jahr": 2010},
+            {"Strategie": "SBA Communication", "Einstieg Datum": "22.03.2010", "Exit Datum": "24.04.2010", "Gewinn": -4, "Equity": 8370, "Jahr": 2010},
+            {"Strategie": "Airbus", "Einstieg Datum": "14.04.2010", "Exit Datum": "25.04.2010", "Gewinn": -62, "Equity": 8308, "Jahr": 2010},
+            {"Strategie": "Abbott Laboratories", "Einstieg Datum": "07.03.2010", "Exit Datum": "27.04.2010", "Gewinn": 1024, "Equity": 9332, "Jahr": 2010},
+            {"Strategie": "Micron Technology", "Einstieg Datum": "15.03.2010", "Exit Datum": "27.04.2010", "Gewinn": 657, "Equity": 9989, "Jahr": 2010},
+            {"Strategie": "American Express", "Einstieg Datum": "01.03.2010", "Exit Datum": "28.04.2010", "Gewinn": 125, "Equity": 10114, "Jahr": 2010},
+            {"Strategie": "Arch Capital Group", "Einstieg Datum": "24.03.2010", "Exit Datum": "29.04.2010", "Gewinn": 301, "Equity": 10415, "Jahr": 2010},
+            {"Strategie": "Sanofi", "Einstieg Datum": "24.03.2010", "Exit Datum": "30.04.2010", "Gewinn": 38, "Equity": 10453, "Jahr": 2010},
+            {"Strategie": "Compass Groupe PLC", "Einstieg Datum": "23.03.2010", "Exit Datum": "01.05.2010", "Gewinn": -122, "Equity": 10331, "Jahr": 2010},
+            {"Strategie": "Deutsche Bank Aktiengesellschaft", "Einstieg Datum": "07.04.2010", "Exit Datum": "02.05.2010", "Gewinn": 838, "Equity": 11169, "Jahr": 2010},
+            {"Strategie": "T-Mobile", "Einstieg Datum": "16.04.2010", "Exit Datum": "09.05.2010", "Gewinn": -260, "Equity": 10909, "Jahr": 2010},
+            {"Strategie": "Walmart Inc", "Einstieg Datum": "02.05.2010", "Exit Datum": "14.05.2010", "Gewinn": 1206, "Equity": 12115, "Jahr": 2010},
+            {"Strategie": "Public Storage", "Einstieg Datum": "14.04.2010", "Exit Datum": "16.05.2010", "Gewinn": -216, "Equity": 11899, "Jahr": 2010},
+            {"Strategie": "Take-Two Interactive Software", "Einstieg Datum": "22.03.2010", "Exit Datum": "19.05.2010", "Gewinn": -178, "Equity": 11721, "Jahr": 2010},
+            {"Strategie": "Archer Daniels Midland", "Einstieg Datum": "22.03.2010", "Exit Datum": "20.05.2010", "Gewinn": -2130, "Equity": 9591, "Jahr": 2010},
+            {"Strategie": "Amazon", "Einstieg Datum": "20.04.2010", "Exit Datum": "27.05.2010", "Gewinn": -2130, "Equity": 7461, "Jahr": 2010},
+            {"Strategie": "Coca Cola KO", "Einstieg Datum": "09.05.2010", "Exit Datum": "28.05.2010", "Gewinn": 436, "Equity": 7897, "Jahr": 2010},
+            {"Strategie": "Live Nation Entertainment", "Einstieg Datum": "08.05.2010", "Exit Datum": "28.05.2010", "Gewinn": 406, "Equity": 8303, "Jahr": 2010},
+            {"Strategie": "MercadoLibre", "Einstieg Datum": "23.05.2010", "Exit Datum": "28.05.2010", "Gewinn": 55, "Equity": 8358, "Jahr": 2010},
+            {"Strategie": "Fortescue Metals", "Einstieg Datum": "05.05.2010", "Exit Datum": "29.05.2010", "Gewinn": 524, "Equity": 8882, "Jahr": 2010},
+            {"Strategie": "Broadcom", "Einstieg Datum": "11.05.2010", "Exit Datum": "02.06.2010", "Gewinn": -38, "Equity": 8844, "Jahr": 2010},
+            {"Strategie": "Visa", "Einstieg Datum": "19.05.2010", "Exit Datum": "02.06.2010", "Gewinn": -484, "Equity": 8360, "Jahr": 2010},
+            {"Strategie": "McKesson Corporation", "Einstieg Datum": "15.05.2010", "Exit Datum": "04.06.2010", "Gewinn": 227, "Equity": 8587, "Jahr": 2010},
+            {"Strategie": "Rio Tinto Group", "Einstieg Datum": "17.05.2010", "Exit Datum": "06.06.2010", "Gewinn": -708, "Equity": 7879, "Jahr": 2010},
+            {"Strategie": "Dassault Systèmes SE", "Einstieg Datum": "28.04.2010", "Exit Datum": "07.06.2010", "Gewinn": 95, "Equity": 7974, "Jahr": 2010},
+            {"Strategie": "Ford Motor Company", "Einstieg Datum": "16.05.2010", "Exit Datum": "09.06.2010", "Gewinn": -115, "Equity": 7859, "Jahr": 2010},
+            {"Strategie": "Vertex Pharmaceuticals", "Einstieg Datum": "05.05.2010", "Exit Datum": "16.06.2010", "Gewinn": 1014, "Equity": 8873, "Jahr": 2010},
+            {"Strategie": "Société Générale", "Einstieg Datum": "17.05.2010", "Exit Datum": "24.06.2010", "Gewinn": 217, "Equity": 9090, "Jahr": 2010},
+            {"Strategie": "AstraZeneca", "Einstieg Datum": "09.06.2010", "Exit Datum": "26.06.2010", "Gewinn": 280, "Equity": 9370, "Jahr": 2010},
+            {"Strategie": "Nestle", "Einstieg Datum": "08.06.2010", "Exit Datum": "26.06.2010", "Gewinn": -575, "Equity": 8795, "Jahr": 2010},
+            {"Strategie": "Continental", "Einstieg Datum": "07.06.2010", "Exit Datum": "27.06.2010", "Gewinn": -1143, "Equity": 7652, "Jahr": 2010},
+            {"Strategie": "Micron Technology", "Einstieg Datum": "07.06.2010", "Exit Datum": "28.06.2010", "Gewinn": -263, "Equity": 7389, "Jahr": 2010},
+            {"Strategie": "McDonalds", "Einstieg Datum": "13.06.2010", "Exit Datum": "06.07.2010", "Gewinn": -1075, "Equity": 6314, "Jahr": 2010},
+            {"Strategie": "Rollins", "Einstieg Datum": "11.06.2010", "Exit Datum": "08.07.2010", "Gewinn": -28, "Equity": 6286, "Jahr": 2010},
+            {"Strategie": "Verizon Comun. VZ", "Einstieg Datum": "12.06.2010", "Exit Datum": "15.07.2010", "Gewinn": 60, "Equity": 6346, "Jahr": 2010},
+            {"Strategie": "Geberit", "Einstieg Datum": "29.06.2010", "Exit Datum": "15.07.2010", "Gewinn": -260, "Equity": 6086, "Jahr": 2010},
+            {"Strategie": "BMW", "Einstieg Datum": "30.06.2010", "Exit Datum": "16.07.2010", "Gewinn": -134, "Equity": 5952, "Jahr": 2010},
+            {"Strategie": "Mondelez International", "Einstieg Datum": "29.06.2010", "Exit Datum": "20.07.2010", "Gewinn": 485, "Equity": 6437, "Jahr": 2010},
+            {"Strategie": "The Procter & Gamble", "Einstieg Datum": "29.06.2010", "Exit Datum": "22.07.2010", "Gewinn": -88, "Equity": 6349, "Jahr": 2010},
+            {"Strategie": "CBRE Groupe", "Einstieg Datum": "28.06.2010", "Exit Datum": "23.07.2010", "Gewinn": -494, "Equity": 5855, "Jahr": 2010},
+            {"Strategie": "Adidas", "Einstieg Datum": "27.06.2010", "Exit Datum": "23.07.2010", "Gewinn": 131, "Equity": 5986, "Jahr": 2010},
+            {"Strategie": "BlackRock", "Einstieg Datum": "24.06.2010", "Exit Datum": "25.07.2010", "Gewinn": 209, "Equity": 6195, "Jahr": 2010},
+            {"Strategie": "Goldman Sachs", "Einstieg Datum": "30.06.2010", "Exit Datum": "25.07.2010", "Gewinn": 88, "Equity": 6283, "Jahr": 2010},
+            {"Strategie": "Equinix", "Einstieg Datum": "27.06.2010", "Exit Datum": "26.07.2010", "Gewinn": 304, "Equity": 6587, "Jahr": 2010},
+            {"Strategie": "Amgen", "Einstieg Datum": "27.06.2010", "Exit Datum": "26.07.2010", "Gewinn": 350, "Equity": 6937, "Jahr": 2010},
+            {"Strategie": "Booking Holdings", "Einstieg Datum": "28.06.2010", "Exit Datum": "27.07.2010", "Gewinn": 142, "Equity": 7079, "Jahr": 2010},
+            {"Strategie": "McDonalds", "Einstieg Datum": "16.07.2010", "Exit Datum": "28.07.2010", "Gewinn": 766, "Equity": 7845, "Jahr": 2010},
+            {"Strategie": "Lennar Corporation", "Einstieg Datum": "26.06.2010", "Exit Datum": "29.07.2010", "Gewinn": -287, "Equity": 7558, "Jahr": 2010},
+            {"Strategie": "Marriott International", "Einstieg Datum": "27.06.2010", "Exit Datum": "29.07.2010", "Gewinn": 549, "Equity": 8107, "Jahr": 2010},
+            {"Strategie": "Cadence Design Systems", "Einstieg Datum": "27.06.2010", "Exit Datum": "29.07.2010", "Gewinn": 204, "Equity": 8311, "Jahr": 2010},
+            {"Strategie": "Sartorius", "Einstieg Datum": "16.07.2010", "Exit Datum": "30.07.2010", "Gewinn": 106, "Equity": 8417, "Jahr": 2010},
+            {"Strategie": "Logitech", "Einstieg Datum": "28.06.2010", "Exit Datum": "01.08.2010", "Gewinn": 366, "Equity": 8783, "Jahr": 2010},
+            {"Strategie": "Danone", "Einstieg Datum": "12.06.2010", "Exit Datum": "01.08.2010", "Gewinn": -61, "Equity": 8722, "Jahr": 2010},
+            {"Strategie": "The Progressive Cooperation", "Einstieg Datum": "06.07.2010", "Exit Datum": "01.08.2010", "Gewinn": 694, "Equity": 9416, "Jahr": 2010},
+            {"Strategie": "Walmart Inc", "Einstieg Datum": "28.06.2010", "Exit Datum": "05.08.2010", "Gewinn": 1109, "Equity": 10525, "Jahr": 2010},
+            {"Strategie": "Ebay", "Einstieg Datum": "29.07.2010", "Exit Datum": "06.08.2010", "Gewinn": -619, "Equity": 9906, "Jahr": 2010},
+            {"Strategie": "Lonza Group", "Einstieg Datum": "30.06.2010", "Exit Datum": "08.08.2010", "Gewinn": 1596, "Equity": 11502, "Jahr": 2010},
+            {"Strategie": "Ryanair", "Einstieg Datum": "29.06.2010", "Exit Datum": "15.08.2010", "Gewinn": 300, "Equity": 11802, "Jahr": 2010},
+            {"Strategie": "Newmont Mining", "Einstieg Datum": "19.07.2010", "Exit Datum": "17.08.2010", "Gewinn": -305, "Equity": 11497, "Jahr": 2010},
+            {"Strategie": "Philip Morris", "Einstieg Datum": "28.07.2010", "Exit Datum": "20.08.2010", "Gewinn": 122, "Equity": 11619, "Jahr": 2010},
+            {"Strategie": "ResMed Inc", "Einstieg Datum": "11.08.2010", "Exit Datum": "26.08.2010", "Gewinn": 469, "Equity": 12088, "Jahr": 2010},
+            {"Strategie": "Geberit", "Einstieg Datum": "10.08.2010", "Exit Datum": "02.09.2010", "Gewinn": -319, "Equity": 11769, "Jahr": 2010},
+            {"Strategie": "Swatch Groupe", "Einstieg Datum": "20.08.2010", "Exit Datum": "14.09.2010", "Gewinn": 624, "Equity": 12393, "Jahr": 2010},
+            {"Strategie": "Nvidia", "Einstieg Datum": "03.08.2010", "Exit Datum": "15.09.2010", "Gewinn": -91, "Equity": 12302, "Jahr": 2010},
+            {"Strategie": "Lockheed Martin Corporation", "Einstieg Datum": "19.08.2010", "Exit Datum": "19.09.2010", "Gewinn": 1514, "Equity": 13816, "Jahr": 2010},
+            {"Strategie": "RWE", "Einstieg Datum": "11.09.2010", "Exit Datum": "23.09.2010", "Gewinn": 103, "Equity": 13919, "Jahr": 2010},
+            {"Strategie": "Match Groupe", "Einstieg Datum": "15.09.2010", "Exit Datum": "25.09.2010", "Gewinn": -192, "Equity": 13727, "Jahr": 2010},
+            {"Strategie": "American Water Works", "Einstieg Datum": "19.09.2010", "Exit Datum": "02.10.2010", "Gewinn": -123, "Equity": 13604, "Jahr": 2010}
+        ];
+
+        const accountSize = 50000;
+        let chart = null;
+        let monthlyChart = null;
+        const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 
+                           'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+        function initializeDashboard() {
+            // Equity neu berechnen für korrekte Darstellung
+            let cumulativeEquity = 0;
+            allData.forEach((trade, index) => {
+                cumulativeEquity += trade.Gewinn;
+                trade.calculatedEquity = cumulativeEquity;
+                trade.tradeNumber = index + 1;
+            });
+
+            displayStats(allData);
+            displayChart(allData);
+            displayMonthlyChart(allData);
+            displayTable(allData);
+        }
+
+        function displayStats(data) {
+            const totalTrades = data.length;
+            const totalProfit = data.reduce((sum, trade) => sum + trade.Gewinn, 0);
+            const positiveTrades = data.filter(trade => trade.Gewinn > 0).length;
+            const winRate = ((positiveTrades / totalTrades) * 100).toFixed(1);
+            const performancePercent = ((totalProfit / accountSize) * 100).toFixed(1);
+            const isPositive = totalProfit >= 0;
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${totalTrades}</div>
+                    <div class="stat-label">Gesamte Trades</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value ${isPositive ? 'positive' : 'negative'}">
+                        ${isPositive ? '+' : ''}${performancePercent}%
+                    </div>
+                    <div class="stat-label">Performance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value ${isPositive ? 'positive' : 'negative'}">
+                        ${totalProfit.toLocaleString('de-CH')}
+                    </div>
+                    <div class="stat-label">Gesamtgewinn</div>
+                    <div class="stat-sublabel">CHF</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${winRate}%</div>
+                    <div class="stat-label">Gewinnrate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${accountSize.toLocaleString('de-CH')}</div>
+                    <div class="stat-label">Kontogröße</div>
+                    <div class="stat-sublabel">CHF</div>
+                </div>
+            `;
+        }
+
+        function displayChart(data) {
+            const ctx = document.getElementById('equityChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            const chartLabels = ['Start', ...data.map((trade, index) => `Trade ${index + 1}`)];
+            const chartData = [0, ...data.map(trade => trade.calculatedEquity)];
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Equity Curve',
+                        data: chartData,
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        fill: true,
+                        tension: 0.1,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#4CAF50',
+                        pointBorderColor: 'transparent'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Trade Nummer'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Equity (CHF)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayMonthlyChart(data) {
+            const ctx = document.getElementById('monthlyChart').getContext('2d');
+            
+            if (monthlyChart) {
+                monthlyChart.destroy();
+            }
+            
+            const monthlyPerformance = {};
+            
+            data.forEach(trade => {
+                if (trade['Exit Datum']) {
+                    const dateParts = trade['Exit Datum'].split('.');
+                    if (dateParts.length === 3) {
+                        const month = parseInt(dateParts[1]) - 1;
+                        const monthName = monthNames[month];
+                        
+                        if (!monthlyPerformance[monthName]) {
+                            monthlyPerformance[monthName] = 0;
+                        }
+                        monthlyPerformance[monthName] += trade.Gewinn;
+                    }
+                }
+            });
+            
+            const monthlyData = monthNames.map(month => monthlyPerformance[month] || 0);
+            
+            monthlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: monthNames,
+                    datasets: [{
+                        label: 'Monatlicher Gewinn',
+                        data: monthlyData,
+                        backgroundColor: monthlyData.map(value => 
+                            value >= 0 ? 'rgba(76, 175, 80, 0.7)' : 'rgba(244, 67, 54, 0.7)'
+                        ),
+                        borderColor: monthlyData.map(value => 
+                            value >= 0 ? '#4CAF50' : '#f44336'
+                        ),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Monat'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Gewinn (CHF)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayTable(data) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.Strategie}</td>
+                    <td>${row['Einstieg Datum']}</td>
+                    <td>${row['Exit Datum']}</td>
+                    <td class="right-align" style="color: ${row.Gewinn >= 0 ? '#4CAF50' : '#f44336'}">${row.Gewinn.toLocaleString('de-CH')}</td>
+                    <td class="right-align" style="color: ${row.calculatedEquity >= 0 ? '#4CAF50' : '#f44336'}">${row.calculatedEquity.toLocaleString('de-CH')}</td>
+                    <td>${row.Jahr}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Dashboard beim Laden initialisieren
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+    </script>
+</body>
+</html>

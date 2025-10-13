@@ -1,0 +1,47 @@
+/* Zusätzliche Responsive Anpassungen */
+
+/* Tablet Landscape */
+@media (max-width: 1024px) {
+    .container {
+        max-width: 100%;
+        padding: 0 30px;
+    }
+    
+    .course-cards,
+    .advantages-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+    .course-cards,
+    .advantages-grid,
+    .contact-options,
+    .dashboard-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    nav a {
+        display: inline-block;
+        margin: 5px 8px;
+    }
+    
+    .hero p,
+    #programm > .container > p,
+    #charts > .container > p {
+        font-size: 16px;
+    }
+    
+    .modal-container {
+        width: 95%;
+        padding: 24px;
+    }
+}
