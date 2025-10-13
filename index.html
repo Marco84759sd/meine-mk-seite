@@ -464,24 +464,25 @@
                 </div>
             </div>
             
-            <form>
-                <input type="text" name="name" placeholder="Name">
-                <input type="email" name="email" placeholder="E-Mail">
-                <input type="tel" name="telefon" placeholder="Telefon">
-                <select name="kontaktart">
+            <form action="https://formspree.io/f/xyznbwyq" method="POST">
+                <input type="text" name="name" placeholder="Name" required>
+                <input type="email" name="email" placeholder="E-Mail" required>
+                <input type="tel" name="telefon" placeholder="Telefon" required>
+                <select name="kontaktart" required>
                     <option value="">Bevorzugte Kontaktart</option>
                     <option value="zoom">Zoom-Call</option>
                     <option value="vorort">Persönlich in Gossau SG</option>
                     <option value="telefon">Telefonat</option>
                 </select>
-                <textarea name="nachricht" placeholder="Ihre Nachricht oder gewünschter Termin" rows="5"></textarea>
-                <!-- Honeypot Spam-Schutz -->
-    <input type="text" name="_gotcha" style="display:none">
-    
-    <!-- Honeypot Spam-Schutz -->
-    <input type="text" name="_gotcha" style="display:none">
-    
-    <button type="submit" class="btn">Kostenloses Gespräch anfragen</button>
+                <textarea name="nachricht" placeholder="Ihre Nachricht oder gewünschter Termin" rows="5" required></textarea>
+                
+                <!-- Honeypot Spam-Schutz (unsichtbar) -->
+                <input type="text" name="_gotcha" style="display:none">
+                
+                <!-- Formspree Einstellungen -->
+                <input type="hidden" name="_subject" value="Neue Kontaktanfrage - Trading Coaching">
+                
+                <button type="submit" class="btn">Kostenloses Gespräch anfragen</button>
             </form>
         </div>
     </section>
