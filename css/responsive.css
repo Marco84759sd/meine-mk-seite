@@ -1,29 +1,96 @@
 /* Zusätzliche Responsive Anpassungen */
 
-/* Tablet Landscape */
+/* Tablet Landscape (iPad) */
 @media (max-width: 1024px) {
     .container {
         max-width: 100%;
         padding: 0 30px;
     }
     
-    .course-cards,
+    /* Course Cards - 2 Spalten mit mehr Abstand */
+    .course-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+    
+    /* Advantages Grid - 2 Spalten */
     .advantages-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+    
+    /* Stats - 2 Spalten */
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    /* Dashboard Info - 2 Spalten */
+    .dashboard-info {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    /* Contact Options - 2 Spalten */
+    .contact-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    /* Highlight Info - 2 Spalten */
+    .highlight-info {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    /* Sections - weniger Padding */
+    section {
+        padding: 60px 0;
+    }
+    
+    /* Timeline Steps - kompakter */
+    .timeline-step {
+        padding: 25px;
+        gap: 20px;
+    }
+}
+
+/* iPad Portrait spezifisch (768px - 834px) */
+@media (min-width: 768px) and (max-width: 834px) {
+    /* Course Cards bleiben 2 Spalten aber mit weniger Gap */
+    .course-cards {
+        gap: 20px;
+    }
+    
+    /* Advantages könnte auf 1 Spalte wechseln für bessere Lesbarkeit */
+    .advantages-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
 }
 
 /* Tablet Portrait */
 @media (max-width: 768px) {
     .course-cards,
-    .advantages-grid,
     .contact-options,
     .dashboard-info {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .advantages-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
     
     .stats {
         grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .highlight-info {
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 }
 
@@ -43,5 +110,23 @@
     .modal-container {
         width: 95%;
         padding: 24px;
+    }
+    
+    /* Stats auf Mobile auch 2 Spalten aber noch kompakter */
+    .stats {
+        gap: 12px;
+    }
+}
+
+/* Sehr kleine Smartphones */
+@media (max-width: 375px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .course-cards,
+    .advantages-grid,
+    .stats {
+        gap: 16px;
     }
 }
