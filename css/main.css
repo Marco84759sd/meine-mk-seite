@@ -244,11 +244,11 @@ nav a:hover::after {
     box-shadow: 0 6px 20px rgba(0, 113, 227, 0.4);
 }
 
-/* Statistik-Boxen */
+/* Statistik-Boxen - iPad optimiert */
 .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 32px;
     max-width: 1000px;
     margin: 60px auto 0;
 }
@@ -736,7 +736,7 @@ nav a:hover::after {
 
 .advantages-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 32px;
     margin-top: 40px;
 }
@@ -1189,6 +1189,49 @@ footer p {
     margin: 0;
     color: var(--text-secondary);
     line-height: 1.7;
+}
+
+/* iPad / Tablet Optimierungen */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        padding: 0 30px;
+    }
+    
+    /* Stats - 2 Spalten mit mehr Abstand */
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 28px;
+    }
+    
+    /* Course Cards - 2 Spalten */
+    .course-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 28px;
+    }
+    
+    /* Advantages Grid - 2 Spalten */
+    .advantages-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 28px;
+    }
+    
+    /* Dashboard Info - 2 Spalten */
+    .dashboard-info {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+    
+    /* Contact Options - 2 Spalten */
+    .contact-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+    
+    /* Highlight Info - 2 Spalten */
+    .highlight-info {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
 }
 
 /* Responsive Design */
