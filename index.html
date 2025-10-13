@@ -475,7 +475,13 @@
                     <option value="telefon">Telefonat</option>
                 </select>
                 <textarea name="nachricht" placeholder="Ihre Nachricht oder gewünschter Termin" rows="5"></textarea>
-                <button type="submit" class="btn">Kostenloses Gespräch anfragen</button>
+                <!-- Honeypot Spam-Schutz -->
+    <input type="text" name="_gotcha" style="display:none">
+    
+    <!-- Honeypot Spam-Schutz -->
+    <input type="text" name="_gotcha" style="display:none">
+    
+    <button type="submit" class="btn">Kostenloses Gespräch anfragen</button>
             </form>
         </div>
     </section>
