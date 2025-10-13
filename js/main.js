@@ -111,91 +111,106 @@ document.addEventListener('DOMContentLoaded', function() {
             if(e.target === modal) closeModal();
         });
     }
-});
 
-// Timeline Bild Hover Effekt
-document.addEventListener('DOMContentLoaded', function() {
+    // Timeline Bild Hover Effekt - nur wenn Elemente existieren
     const timelineSteps = document.querySelectorAll('.timeline-step');
-    const imageModal = document.createElement('div');
-    imageModal.className = 'image-modal';
-    imageModal.innerHTML = `
-        <span class="close-modal">&times;</span>
-        <img class="image-modal-content" src="" alt="Kurs Bild">
-    `;
-    document.body.appendChild(imageModal);
     
-    const modalImg = imageModal.querySelector('.image-modal-content');
-    const closeBtn = imageModal.querySelector('.close-modal');
-    
-    timelineSteps.forEach(step => {
-        const imageHover = step.querySelector('.step-image-hover');
-        const imageUrl = step.getAttribute('data-image');
+    if (timelineSteps.length > 0) {
+        // Prüfe ob es Step-Images gibt
+        const hasStepImages = document.querySelector('.step-image-hover');
         
-        imageHover.addEventListener('click', function() {
-            modalImg.src = imageUrl;
-            imageModal.style.display = 'flex';
-        });
-    });
-    
-    closeBtn.addEventListener('click', function() {
-        imageModal.style.display = 'none';
-    });
-    
-    imageModal.addEventListener('click', function(e) {
-        if (e.target === imageModal) {
-            imageModal.style.display = 'none';
-        }
-    });
-});
-
-// Variante 3: Akkordeon Toggle
-document.addEventListener('DOMContentLoaded', function() {
-    // Akkordeon Funktionalität
-    const expandToggles = document.querySelectorAll('.expand-toggle');
-    expandToggles.forEach(toggle => {
-        toggle.addEventListener('click', function() {
-            const content = this.nextElementSibling;
-            const icon = this.querySelector('.fa-chevron-down');
+        if (hasStepImages) {
+            const imageModal = document.createElement('div');
+            imageModal.className = 'image-modal';
+            imageModal.innerHTML = `
+                <span class="close-modal">&times;</span>
+                <img class="image-modal-content" src="" alt="Kurs Bild">
+            `;
+            document.body.appendChild(imageModal);
             
-            if (content.style.display === 'block') {
-                content.style.display = 'none';
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                content.style.display = 'block';
-                icon.style.transform = 'rotate(180deg)';
+            const modalImg = imageModal.querySelector('.image-modal-content');
+            const closeBtn = imageModal.querySelector('.close-modal');
+            
+            timelineSteps.forEach(step => {
+                const imageHover = step.querySelector('.step-image-hover');
+                const imageUrl = step.getAttribute('data-image');
+                
+                if (imageHover && imageUrl) {
+                    imageHover.addEventListener('click', function() {
+                        modalImg.src = imageUrl;
+                        imageModal.style.display = 'flex';
+                    });
+                }
+            });
+            
+            closeBtn.addEventListener('click', function() {
+                imageModal.style.display = 'none';
+            });
+            
+            imageModal.addEventListener('click', function(e) {
+                if (e.target === imageModal) {
+                    imageModal.style.display = 'none';
+                }
+            });
+        }
+    }
+
+    // Akkordeon Funktionalität - nur wenn Elemente existieren
+    const expandToggles = document.querySelectorAll('.expand-toggle');
+    if (expandToggles.length > 0) {
+        expandToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('.fa-chevron-down');
+                
+                if (content) {
+                    if (content.style.display === 'block') {
+                        content.style.display = 'none';
+                        if (icon) icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.display = 'block';
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    }
+                }
+            });
+        });
+    }
+    
+    // Bild Modal für alle Varianten - nur wenn Elemente existieren
+    const imageElements = document.querySelectorAll('[data-image], .step-image-preview, .step-thumbnail, .visual-icon, .gallery-preview');
+    
+    if (imageElements.length > 0) {
+        const imageModal = document.createElement('div');
+        imageModal.className = 'image-modal';
+        imageModal.innerHTML = `
+            <span class="close-modal">&times;</span>
+            <img class="image-modal-content" src="" alt="Kurs Bild">
+        `;
+        document.body.appendChild(imageModal);
+        
+        const modalImg = imageModal.querySelector('.image-modal-content');
+        const closeBtn = imageModal.querySelector('.close-modal');
+        
+        imageElements.forEach(element => {
+            element.addEventListener('click', function() {
+                const imageUrl = this.getAttribute('data-image') || 'images/Kurs_01.jpg';
+                if (imageUrl) {
+                    modalImg.src = imageUrl;
+                    imageModal.style.display = 'flex';
+                }
+            });
+        });
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                imageModal.style.display = 'none';
+            });
+        }
+        
+        imageModal.addEventListener('click', function(e) {
+            if (e.target === imageModal) {
+                imageModal.style.display = 'none';
             }
         });
-    });
-    
-    // Bild Modal für alle Varianten
-    const imageModal = document.createElement('div');
-    imageModal.className = 'image-modal';
-    imageModal.innerHTML = `
-        <span class="close-modal">&times;</span>
-        <img class="image-modal-content" src="" alt="Kurs Bild">
-    `;
-    document.body.appendChild(imageModal);
-    
-    const modalImg = imageModal.querySelector('.image-modal-content');
-    const closeBtn = imageModal.querySelector('.close-modal');
-    
-    // Klick-Event für alle Bild-Elemente
-    const imageElements = document.querySelectorAll('[data-image], .step-image-preview, .step-thumbnail, .visual-icon, .gallery-preview');
-    imageElements.forEach(element => {
-        element.addEventListener('click', function() {
-            const imageUrl = this.getAttribute('data-image') || 'images/Kurs_01.jpg';
-            modalImg.src = imageUrl;
-            imageModal.style.display = 'flex';
-        });
-    });
-    
-    closeBtn.addEventListener('click', function() {
-        imageModal.style.display = 'none';
-    });
-    
-    imageModal.addEventListener('click', function(e) {
-        if (e.target === imageModal) {
-            imageModal.style.display = 'none';
-        }
-    });
+    }
 });
