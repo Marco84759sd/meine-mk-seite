@@ -7,40 +7,64 @@
         padding: 0 30px;
     }
     
+    /* WICHTIG: Mehr Abstand zwischen allen Hauptsektionen auf iPad */
+    .hero {
+        margin: 40px 20px 60px 20px !important;
+    }
+    
+    #programm,
+    #ablauf,
+    #charts,
+    .advantages,
+    .transparency,
+    .member-login,
+    #kontakt,
+    .faq-section {
+        margin: 60px 20px !important;
+    }
+    
+    .disclaimer {
+        margin: 60px 20px !important;
+    }
+    
+    footer {
+        margin-top: 80px !important;
+    }
+    
     /* Course Cards - 2 Spalten mit mehr Abstand */
     .course-cards {
         grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
+        gap: 28px;
     }
     
     /* Advantages Grid - 2 Spalten */
     .advantages-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
+        gap: 28px;
     }
     
     /* Stats - 2 Spalten */
     .stats {
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+        gap: 28px;
     }
     
     /* Dashboard Info - 2 Spalten */
     .dashboard-info {
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+        gap: 24px;
     }
     
     /* Contact Options - 2 Spalten */
     .contact-options {
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+        gap: 24px;
     }
     
     /* Highlight Info - 2 Spalten */
     .highlight-info {
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+        gap: 24px;
     }
     
     /* Sections - weniger Padding */
@@ -66,6 +90,18 @@
     .advantages-grid {
         grid-template-columns: 1fr;
         gap: 20px;
+    }
+    
+    /* Section Margins noch etwas erhöhen */
+    #programm,
+    #ablauf,
+    #charts,
+    .advantages,
+    .transparency,
+    .member-login,
+    #kontakt,
+    .faq-section {
+        margin: 50px 20px !important;
     }
 }
 
