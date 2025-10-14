@@ -1191,49 +1191,6 @@ footer p {
     line-height: 1.7;
 }
 
-/* iPad / Tablet Optimierungen */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .container {
-        padding: 0 30px;
-    }
-    
-    /* Stats - 2 Spalten mit mehr Abstand */
-    .stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 28px;
-    }
-    
-    /* Course Cards - 2 Spalten */
-    .course-cards {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 28px;
-    }
-    
-    /* Advantages Grid - 2 Spalten */
-    .advantages-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 28px;
-    }
-    
-    /* Dashboard Info - 2 Spalten */
-    .dashboard-info {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
-    }
-    
-    /* Contact Options - 2 Spalten */
-    .contact-options {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
-    }
-    
-    /* Highlight Info - 2 Spalten */
-    .highlight-info {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
-    }
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
